@@ -1,0 +1,19 @@
+name: Deploy to CapRover
+
+on:
+  push:
+    branches:
+      - main  # Aqui está configurado para o branch 'main'. Altere se necessário.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy to CapRover
+        run: |
+          npm install -g caprover
+          caprover deploy --caprover-url http://whaticket.cap.digitalis.marketing --caprover-app whaticket --caprover-token ${{ secrets.CAPROVER_TOKEN }}
+    env:
+      CAPROVER_TOKEN: ${{ secrets.CAPROVER_TOKEN }}
