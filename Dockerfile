@@ -9,6 +9,9 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y google-chrome-stable
 
+# Limpa o cache do npm
+RUN npm cache clean --force
+
 # Cria os diretórios necessários e define permissões
 RUN mkdir -p /app && \
     chown -R node:node /app
@@ -19,8 +22,8 @@ WORKDIR /app
 # Copia os arquivos do projeto para o diretório de trabalho no container
 COPY . /app
 
-# Instala as dependências do Node.js
-RUN npm install --force
+# Instala as dependências do Node.js usando npm ci
+RUN npm ci --only=production
 
 # Exponha a porta 8080 para o backend
 EXPOSE 8080
@@ -30,4 +33,3 @@ EXPOSE 80
 
 # Comando para iniciar o servidor quando o container subir
 CMD ["npm", "start"]
-
