@@ -9,25 +9,19 @@ RUN apt-get update && \
     echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
     apt-get update && apt-get install -y google-chrome-stable
 
-# Crie um diretório para a aplicação
+# Definir diretório de trabalho
 WORKDIR /usr/src/app
 
-# Copie os arquivos da aplicação para o contêiner
-COPY . .
+# Copiar package.json e package-lock.json antes de copiar o restante dos arquivos
+COPY package*.json ./
 
-# Limpar cache do npm
-RUN npm cache clean --force
-
-# Apaga o package-lock.json e a pasta node_modules para evitar conflitos
-RUN rm -f package-lock.json && rm -rf node_modules
-
-# Instala as dependências com npm e adiciona verbose para debug
+# Instalar dependências do npm
 RUN npm install --legacy-peer-deps --no-audit --no-fund --verbose
 
-# Alternativa: rodar o comando ci e depois limpar as dependências de desenvolvimento
-# RUN npm ci --only=production
+# Copiar o restante dos arquivos da aplicação
+COPY . .
 
-# Exposição de portas (ajuste conforme necessário)
+# Expor a porta (ajuste conforme necessário)
 EXPOSE 3000
 
 # Comando para iniciar a aplicação
