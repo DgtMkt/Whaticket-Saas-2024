@@ -3,22 +3,23 @@ name: Deploy to CapRover
 on:
   push:
     branches:
-      - main  # Mantenha a branch correta aqui.
+      - main  # Alterar para a branch desejada.
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3  # Versão mais recente do checkout
+      - uses: actions/checkout@v3  # Mantendo o checkout mais recente
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Mantemos o Node.js versão 16
+          node-version: '16'
 
       - name: Deploy to CapRover
         run: |
           npm install -g caprover
+          caprover login -h http://whaticket.cap.digitalis.marketing -p ${{ secrets.CAPROVER_TOKEN }}
           caprover deploy -h http://whaticket.cap.digitalis.marketing -a whaticket -t ${{ secrets.CAPROVER_TOKEN }}
     env:
       CAPROVER_TOKEN: ${{ secrets.CAPROVER_TOKEN }}
