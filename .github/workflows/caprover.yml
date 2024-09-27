@@ -3,7 +3,7 @@ name: Deploy to CapRover
 on:
   push:
     branches:
-      - main  # Alterar para a branch desejada.
+      - main  # Mantenha a branch correta aqui.
 
 jobs:
   deploy:
@@ -19,7 +19,7 @@ jobs:
       - name: Deploy to CapRover
         run: |
           npm install -g caprover
-          caprover login -h http://whaticket.cap.digitalis.marketing -p ${{ secrets.CAPROVER_TOKEN }}
-          caprover deploy -h http://whaticket.cap.digitalis.marketing -a whaticket -t ${{ secrets.CAPROVER_TOKEN }}
+          caprover login -u http://whaticket.cap.digitalis.marketing -p ${{ secrets.CAPROVER_TOKEN }}
+          caprover deploy -u http://whaticket.cap.digitalis.marketing -a whaticket -p ${{ secrets.CAPROVER_TOKEN }}
     env:
       CAPROVER_TOKEN: ${{ secrets.CAPROVER_TOKEN }}
