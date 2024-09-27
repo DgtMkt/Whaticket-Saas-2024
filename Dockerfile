@@ -1,35 +1,28 @@
-# Utiliza a imagem base Node 16
+# Defina a imagem base Node.js
 FROM node:16
 
-# Atualiza o sistema e instala pacotes necessários
+# Instala dependências do sistema
 RUN apt-get update && \
     apt-get install -y sudo curl wget nginx postgresql redis && \
-    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list' && \
-    apt-get update && \
-    apt-get install -y google-chrome-stable
+    apt-get install -y gnupg && \
+    curl -sSL https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add - && \
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && apt-get install -y google-chrome-stable
 
-# Limpa o cache do npm
-RUN npm cache clean --force
+# Crie um diretório para a aplicação
+WORKDIR /usr/src/app
 
-# Cria os diretórios necessários e define permissões
-RUN mkdir -p /app && \
-    chown -R node:node /app
+# Copie os arquivos da aplicação para o contêiner
+COPY . .
 
-# Define o diretório de trabalho
-WORKDIR /app
+# Apaga o package-lock.json e a pasta node_modules para evitar conflitos
+RUN rm -f package-lock.json && rm -rf node_modules
 
-# Copia os arquivos do projeto para o diretório de trabalho no container
-COPY . /app
+# Instala as dependências com npm, e força a instalação caso ocorram erros
+RUN npm install --force
 
-# Instala as dependências do Node.js usando npm ci
-RUN npm ci --only=production
+# Alternativa: rodar o comando ci e depois limpar as dependências de desenvolvimento
+# RUN npm ci --only=production
 
-# Exponha a porta 8080 para o backend
-EXPOSE 8080
-
-# Exponha a porta 80 para o frontend
-EXPOSE 80
-
-# Comando para iniciar o servidor quando o container subir
+# Comando para iniciar a aplicação (ajuste conforme sua necessidade)
 CMD ["npm", "start"]
