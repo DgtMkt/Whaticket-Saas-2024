@@ -15,14 +15,20 @@ WORKDIR /usr/src/app
 # Copie os arquivos da aplicação para o contêiner
 COPY . .
 
+# Limpar cache do npm
+RUN npm cache clean --force
+
 # Apaga o package-lock.json e a pasta node_modules para evitar conflitos
 RUN rm -f package-lock.json && rm -rf node_modules
 
-# Instala as dependências com npm, e força a instalação caso ocorram erros
-RUN npm install --force
+# Instala as dependências com npm e adiciona verbose para debug
+RUN npm install --legacy-peer-deps --no-audit --no-fund --verbose
 
 # Alternativa: rodar o comando ci e depois limpar as dependências de desenvolvimento
 # RUN npm ci --only=production
 
-# Comando para iniciar a aplicação (ajuste conforme sua necessidade)
+# Exposição de portas (ajuste conforme necessário)
+EXPOSE 3000
+
+# Comando para iniciar a aplicação
 CMD ["npm", "start"]
