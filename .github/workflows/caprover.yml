@@ -3,7 +3,7 @@ name: Deploy to CapRover
 on:
   push:
     branches:
-      - main  # Altere para a branch desejada.
+      - main  # Mantenha a branch correta.
 
 jobs:
   deploy:
@@ -19,5 +19,6 @@ jobs:
       - name: Deploy to CapRover
         run: |
           npm install -g caprover
+          mkdir -p ~/.caprover  # Cria o diretório .caprover
           echo "{\"caproverUrl\": \"http://whaticket.cap.digitalis.marketing\", \"caproverApp\": \"whaticket\", \"caproverPassword\": \"${{ secrets.CAPROVER_TOKEN }}\"}" > ~/.caprover/config.json
           caprover deploy
