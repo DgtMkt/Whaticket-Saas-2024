@@ -1,31 +1,33 @@
-# Utiliza uma imagem base do Node.js para a aplicação backend
+# Utiliza a imagem base Node 16
 FROM node:16
 
-# Instala as dependências do sistema necessárias
+# Atualiza o sistema e instala pacotes necessários
 RUN apt-get update && \
     apt-get install -y sudo curl wget nginx postgresql redis && \
+    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list' && \
+    apt-get update && \
     apt-get install -y google-chrome-stable
 
-# Define o diretório de trabalho no container
+# Cria os diretórios necessários e define permissões
+RUN mkdir -p /app && \
+    chown -R node:node /app
+
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Copia todos os arquivos do projeto para o container
-COPY . .
+# Copia os arquivos do projeto para o diretório de trabalho no container
+COPY . /app
 
-# Dá permissão de execução aos scripts .sh
-RUN chmod +x lib/*.sh
-RUN chmod +x utils/*.sh
-RUN chmod +x variables/*.sh
+# Instala as dependências do Node.js
+RUN npm install --force
 
-# Instala as dependências do Node.js para o backend
-RUN cd /app/backend && npm install --force
-
-# Configura o Redis e o banco de dados
-RUN ./lib/_backend.sh
-
-# Exponha as portas necessárias (8080 para o backend e 80 para o Nginx)
+# Exponha a porta 8080 para o backend
 EXPOSE 8080
+
+# Exponha a porta 80 para o frontend
 EXPOSE 80
 
-# Inicializa o PM2 para rodar o backend e inicia o Nginx
-CMD ["pm2-runtime", "start", "whatstalk/server.js", "--name", "whaticket-backend"] && service nginx start
+# Comando para iniciar o servidor quando o container subir
+CMD ["npm", "start"]
+
